@@ -15,10 +15,14 @@ char flameTimer[32][32];
 node* corr[32][32];
 
 void readMatrix();//uint32_t matrix[32][32], int& n, int& m
+	// Hai ca o fac acum repede pana termina Anca cu scripturile
+	// ar trebui sa arate ca in enunt
 
 void calculateChainReaction();// uint32_t matrix[32][32], int n, int m, char flameTimer[32][32]
+	//Anca can Dijkstra? I can't Dijkstra
 
 void calculateFlameTimers(); //uint32_t matrix[32][32], int n, int m, char flameTimer[32][32]
+	//astea ar trebui sa fie cateva foruri, can Lexi please do it
 
 void initializeRoutes(); //uint32_t matrix[32][32], int n, int m,  node* corr[32][32], node rootNode
 
