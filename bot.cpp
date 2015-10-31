@@ -65,12 +65,12 @@ void initializeRoutes() {
 	queue<queueNode> q;
 	q.push(current);
 
-	node * newNode = nullptr;
+	node * newNode = NULL;
 	rootNode = new node;
 	rootNode->x = currentx;
 	rootNode->y = currenty;
 	rootNode->weight = MAXWEIGHTKIDS;
-	rootNode->parent = nullptr;
+	rootNode->parent = NULL;
 	corr[currentx][currenty] = rootNode;
 
 	while(!q.empty())
@@ -108,5 +108,5 @@ void constructRoutes()
 
 	rootNode = corr[currentx][currenty];
 	rootNode->kids.push_back(rootNode->parent);
-	rootNode->parent = nullptr;
+	rootNode->parent = NULL;
 }
