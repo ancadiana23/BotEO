@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1446314992 source:d:\scoala\facultate\anul iii\eestec olypmics\boteo\main.cpp
+	"bot.h"
+
+1446315222 d:\scoala\facultate\anul iii\eestec olypmics\boteo\bot.h
+	<stdint.h>
+
