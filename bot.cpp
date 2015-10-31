@@ -85,7 +85,6 @@ void initializeRoutes() {
 			}
 		}
 	}
-
 }
 
 void constructRoutes()
@@ -95,4 +94,7 @@ void constructRoutes()
 		return;
 	}
 
+	rootNode = corr[currentx][currenty];
+	rootNode->kids.push_back(rootNode->parent);
+	rootNode->parent = nullptr;
 }
