@@ -1,3 +1,6 @@
+#ifndef BOT_H_INCLUDED
+#define BOT_H_INCLUDED
+
 #include "defines.h"
 #include <stdint.h>
 
@@ -26,3 +29,5 @@ void constructRoutes(); //uint32_t matrix[32][32], int n, int m,  node* corr[32]
 void playNormal();
 
 void playAggresive(); //okay nu stiu inca diferenta prea tare dar ceva imi spune ca o sa avem nevoie
+
+#endif
