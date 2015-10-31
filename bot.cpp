@@ -1,6 +1,11 @@
 #include "bot.h"
 #include <queue>
 
+void readMatrix()
+{
+
+}
+
 void calculateFlameTimers()
 {
 	for(int i=0;i<m;++i)

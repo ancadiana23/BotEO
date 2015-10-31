@@ -20,4 +20,8 @@ struct queueNode{
 int dirx[] = {-1, 0, 1,  0},
 	diry[] = { 0, 1, 0, -1};
 
+#define SERVER_IP "192.168.56.101"
+#define SERVER_PORT 10000
+
+
 #endif // DEFINES_H_INCLUDED
