@@ -1,6 +1,7 @@
 #ifndef DEFINES_H_INCLUDED
 #define DEFINES_H_INCLUDED
 #include <vector>
+#include <stdint.h>
 
 #define MAXWEIGHTKIDS 16
 
@@ -15,10 +16,6 @@ struct node{
 struct queueNode{
 	int x, y;
 };
-
-
-int dirx[] = {-1, 0, 1,  0},
-	diry[] = { 0, 1, 0, -1};
 
 #define SERVER_IP "192.168.56.101"
 #define SERVER_PORT 10000

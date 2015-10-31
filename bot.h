@@ -2,15 +2,7 @@
 #define BOT_H_INCLUDED
 
 #include "defines.h"
-#include <stdint.h>
-
-node* rootNode;
-
-int n, m;
-int currentx, currenty, currentmovement;
-uint32_t matrix[32][32];
-char flameTimer[32][32];
-node* corr[32][32];
+#include <stdlib.h>
 
 void readMatrix();//uint32_t matrix[32][32], int& n, int& m
 	// Hai ca o fac acum repede pana termina Anca cu scripturile
