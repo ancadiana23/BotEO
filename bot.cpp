@@ -188,13 +188,13 @@ void calculateChainReaction()
 		for(i=1;i<=6;++i)
 		{
 			if((matrix[current.x+i][current.y]&((1<<15)==1))||(current.x+i>m)) break;
-			if(matrix[current.x+i][current.y]&(11111111<<24)
+			if(matrix[current.x+i][current.y]&(11111111<<24))
 				matrix[current.x+i][current.y] = matrix[current.x][current.y]&(11111111<<24)+1<<24;
 		}
 		for(i=-6;i<0;++i)
 		{
 			if((matrix[current.x+i][current.y]&((1<<15)==1))||(current.x-i<0)) break;
-			if(matrix[current.x+i][current.y]&(11111111<<24)
+			if(matrix[current.x+i][current.y]&(11111111<<24))
 				matrix[current.x+i][current.y] = matrix[current.x][current.y]&(11111111<<24)+1<<24;
 		}
 		for(j=1;j<=6;++j)
