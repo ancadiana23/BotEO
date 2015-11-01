@@ -429,9 +429,68 @@ void playNormal(bool &place, int &movedir)
 	++movedir;
 }
 
-void playAggresive(bool &place, int&movedir) {
-	//nota: cand suntem aproape de adversar, tactica ar trebui sa fie aceeasi ca la play aggressive
-	//care e tactica asta...yeah idk
+int neighbors(node &n)
+{
+	int nr = 0;
+	node next;
+	int(i=0; i<4; ++i)
+	{
+		next.x = n.x + dirx[i];
+		next.y = n.y + diry[i];
+		if(is_walkable(1, next))
+			++nr;
+	}
+	return 0;
+}
+
+void playAggresive(bool &place, int&movedir)
+{
+	place = 0;
+	movedir = -1;
+
+	int i, j;
+	for(i=0; i<n; ++i)
+		for(j=0; j<m; ++j)
+			tempweights[i][j] = -100;
+	queue<node> q;
+	node current, next;
+
+	current.x = enemyx;
+	current.y = enemyy;
+	current.weight = tempweights[current.x][current.y] = 0;
+	q.push(current);
+
+	while(!q.empty())
+	{
+		current = q.top();
+		q.pop();
+
+		for(i=0; i<4; ++i)
+		{
+			next.x = current.x + dirx[i];
+			next.y = current.y + diry[i];
+			next.weight = current.weight + 1; //use weights as distances mmmkay
+			if(next.weight < 7 &&
+			   is_walkable(current->weight, next) && tempweights[next.x][next.y] == -100)
+			{
+				tempweights[next.x][next.y] = current.weight + 1;
+				if(next.x = currentx && next.y = currenty)
+				{
+					q.clear();
+					break;
+				}
+				else {
+					q.push(next);
+				}
+			}
+		}
+	}
+
+	for(i=0; i<4; ++i)
+		if(tempweights[currentx + dirx[i][currenty + diry[i]] == tempweights[currentx][currenty] - 1)
+			movedir = i;
+
+	++movedir;
 }
 
 void cleanup()
