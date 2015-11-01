@@ -13,7 +13,7 @@
 
 
 
-int dirx[] = {0, -1,  0,  1},
+int dirx[] = {0, -1,  0, 1},
 	diry[] = {1,  0, -1, 0};
 
 node* rootNode;
@@ -240,6 +240,7 @@ void calculateChainReaction()
 		for(i=1;i<=6;++i)
 		{
 			if((matrix[current.x+i][current.y]&(1<<15))==1||(current.x+i > n)) break;
+
 			if(matrix[current.x+i][current.y]&(11111111<<24))
 				matrix[current.x+i][current.y] = (matrix[current.x][current.y]&(11111111<<24))+(1<<24);
 		}
@@ -413,12 +414,12 @@ void playNormal(bool &place, int &movedir)
 		currNode.x = rootNode->x + dirx[i];
 		currNode.y = rootNode->y + diry[i];
 		if(is_walkable(1, &currNode));
-			for(int j=1; j<4; ++j)
+			for(int j=0; j<4; ++j)
 			{
 				tempNode.x = currNode.x + dirx[j];
 				tempNode.y = currNode.y + diry[j];
 				if(is_walkable(2, &tempNode))
-				++weight;
+					++weight;
 			}
 		if(weight > maxweight)
 		{
@@ -430,5 +431,15 @@ void playNormal(bool &place, int &movedir)
 }
 
 void playAggresive(bool &place, int&movedir) {
+	//nota: cand suntem aproape de adversar, tactica ar trebui sa fie aceeasi ca la play aggressive
+	//care e tactica asta...yeah idk
+}
 
+void cleanup()
+{
+	int i, j;
+	for(i=0; i<n; ++i)
+		for(j=0; j<m; ++j)
+			if(corr[i][j])
+				free(corr[i][j]);
 }
