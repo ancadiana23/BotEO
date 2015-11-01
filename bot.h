@@ -5,8 +5,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void init();
+int init();
 void close_connection();
+void sendMove(bool place, int movedir);
 void readMatrix();//uint32_t matrix[32][32], int& n, int& m
 	// Hai ca o fac acum repede pana termina Anca cu scripturile
 	// ar trebui sa arate ca in enunt
@@ -21,7 +22,7 @@ void initializeRoutes(); //apelat la prima mutare
 
 void constructRoutes(node* currentNode, node* parent, char &maxweight, char dir, int recursionlevel, int &depth); //uint32_t matrix[32][32], int n, int m,  node* corr[32][32], node rootNode
 
-void playNormal();
+void playNormal(bool &place, int &movedir);
 
 void playAggresive(); //okay nu stiu inca diferenta prea tare dar ceva imi spune ca o sa avem nevoie
 

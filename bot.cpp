@@ -26,18 +26,12 @@ uint32_t matrix[32][32];
 char flameTimer[32][32];
 node* corr[32][32];
 
-void init()
+int init()
 {
-	printf("%s" "buu");
+	printf("1 ");
 	struct sockaddr_in to_station = {0};
-	char *buf = (char*)calloc (4, 1);
+	char *buf = (char*)calloc (4, sizeof(char));
 	int fd = socket(AF_INET, SOCK_STREAM, 0);
-
-	printf("%s" "buu");
-
-	if(fd < 0) {
-		return;
-	}
 
 	to_station.sin_family = AF_INET;
 
@@ -45,52 +39,74 @@ void init()
 
 	(inet_aton(SERVER_IP, &(to_station.sin_addr)));
 
-
-/*	char *addr = (char *)malloc(14);
-	const size_t x = 14;
-	sprintf(addr, "%s", SERVER_IP);
-
-	bzero(&addr, x);
-	*/
-
-	printf("%s" ,"buu");
 	int connected = connect(fd, (struct sockaddr *)&to_station, sizeof(to_station));
-
-	printf("Connect %d", connect);
-
+	
 	int receive;
 	char * name = (char *)malloc(4);
+
 
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
 	id = (int) atoi(name);
-
+/*	if (receive < 0)
+	{
+		printf("Cannot receive id");
+	}
+	*/
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
 	currentmovement = (int) atoi(name);
-
+/*
+	if (receive < 0)
+	{
+		printf("Cannot receive curr_mov");
+	}
+	*/
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
 	start_mod_agresiv = (int) atoi(name);
-
+/*
+	if (receive < 0)
+	{
+		printf("Cannot receive aggr");
+	}
+	*/
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
 	mutare_maxima = (int) atoi(name);
 
+	/*if (receive < 0)
+	{
+		printf("Cannot receive max");
+	}
+	*/
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
 	n = (int) atoi(name);
-
+/*
+	if (receive < 0)
+	{
+		printf("Cannot receive n");
+	}
+	*/
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
 	m = (int) atoi(name);
-
+/*
+	if (receive < 0)
+	{
+		printf("Cannot receive m");
+	}*/
 	int i,j;
 	for (i = 0; i < n ;i++)
 	{
 		for (j = 0; j < m; j++)
 		{
 			receive = recv(fd, &buf, 4, 0);
+		/*	if (receive < 0)
+			{
+				printf("Cannot receive data");
+			}*/	
 			sprintf(name, "%d", buf);
 			matrix[i][j] = (uint32_t) atoi(name);
 
@@ -116,7 +132,7 @@ void init()
 			}
 		}
 	}
-	printf("%d %d %d \n", id, n, m);
+	/*printf("%d %d %d \n", id, n, m);
 	for (i = 0; i < n;i++)
 	{
 		for (j = 0; j < m; j++)
@@ -125,10 +141,14 @@ void init()
 		}
 		printf("\n");
 	}
+*/	
+	return start_mod_agresiv;
+//	return 2;
 }
 
 void close_connection()
 {
+	shutdown(fd, 2);
 	close(fd);
 }
 
@@ -182,6 +202,14 @@ void readMatrix()
 	}
 }
 
+void sendMove(bool place, int movedir)
+{
+	int move = movedir | (place << 31);
+	char *buf = (char*)calloc (4, 1);
+	sprintf(buf, "%d", move);
+	write(fd, buf, sizeof(buf));
+}
+
 bool operator<(const queueNode& L, const queueNode& R)
 {
 	return (matrix[L.x][L.y]&(11111111<<24))<(matrix[R.x][R.y]&(11111111<<24));
@@ -204,13 +232,14 @@ void calculateChainReaction()
 			}
 		}
 	}
+	
 	while(!Q.empty())
 	{
 		current=Q.top();
 		Q.pop();
 		for(i=1;i<=6;++i)
 		{
-			if((matrix[current.x+i][current.y]&(1<<15))==1||(current.x+i>m)) break;
+			if((matrix[current.x+i][current.y]&(1<<15))==1||(current.x+i > n)) break;
 			if(matrix[current.x+i][current.y]&(11111111<<24))
 				matrix[current.x+i][current.y] = (matrix[current.x][current.y]&(11111111<<24))+(1<<24);
 		}
@@ -222,7 +251,7 @@ void calculateChainReaction()
 		}
 		for(j=1;j<=6;++j)
 		{
-			if((matrix[current.x][current.y+j]&(1<<15))==1||(current.y+j>n)) break;
+			if((matrix[current.x][current.y+j]&(1<<15))==1||(current.y+j>m)) break;
 			if(matrix[current.x][current.y+j]&(11111111<<24))
 				matrix[current.x][current.y+j] = (matrix[current.x][current.y]&(11111111<<24))+(1<<24);
 		}
@@ -310,7 +339,8 @@ void initializeRoutes() {
 				newNode->weight = MINWEIGHTKIDS;
 				newNode->parent = corr[current.x][current.y];
 				newNode->kids.push_back(newNode->parent);
-
+				
+				corr[next.x][next.y] = newNode;
 				corr[current.x][current.y]->weight *= 2;
                 corr[current.x][current.y]->kids.push_back(newNode);
 			}
@@ -333,7 +363,7 @@ void constructRoutes(node* currentNode, node* parent, int &maxweight, int &dir, 
 		initializeRoutes();
 		return;
 	}
-
+/*
 	currentNode->parent = parent;
 
 	for(k=0; k<currentNode->kids.size(); ++k)
@@ -356,7 +386,7 @@ void constructRoutes(node* currentNode, node* parent, int &maxweight, int &dir, 
 				depth = recursionlevel + 1;
 			}
 		}
-	}
+	}*/
 }
 
 void playNormal(bool &place, int &movedir)
@@ -365,7 +395,7 @@ void playNormal(bool &place, int &movedir)
 	movedir = -1;
 
 	constructRoutes(rootNode, NULL, weight, movedir, 1, length);
-	if(length > 3)
+	/*if(length > 3)
 	{
 		place = length<=6;
 		++movedir;
@@ -396,7 +426,7 @@ void playNormal(bool &place, int &movedir)
 			movedir = i;
 		}
 	}
-	++movedir;
+	++movedir;*/
 }
 
 void playAggresive(bool &place, int&movedir) {
