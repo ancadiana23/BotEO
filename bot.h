@@ -20,11 +20,13 @@ void calculateFlameTimers(); //uint32_t matrix[32][32], int n, int m, char flame
 
 void initializeRoutes(); //apelat la prima mutare
 
-void constructRoutes(node* currentNode, node* parent, int &maxweight, uint32_t &dir, int recursionlevel, int &depth); //uint32_t matrix[32][32], int n, int m,  node* corr[32][32], node rootNode
+void constructRoutes(node* currentNode, node* parent, int &maxweight, int32_t &dir, int recursionlevel, int &depth); //uint32_t matrix[32][32], int n, int m,  node* corr[32][32], node rootNode
 
-void playNormal(bool &place, uint32_t &movedir);
+void playNormal(bool &place, int32_t &movedir);
 
-void playAggresive(); //okay nu stiu inca diferenta prea tare dar ceva imi spune ca o sa avem nevoie
+void playAggresive(bool &place, int32_t &movedir); //okay nu stiu inca diferenta prea tare dar ceva imi spune ca o sa avem nevoie
+
+int getMax();
 
 #define SERVER_PORT 10000
 #define SERVER_IP   "192.168.56.101"

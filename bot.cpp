@@ -12,7 +12,6 @@
 
 
 
-
 int dirx[] = {0, -1,  0, 1},
 	diry[] = {1,  0, -1, 0};
 
@@ -25,6 +24,11 @@ int start_mod_agresiv, mutare_maxima;
 uint32_t matrix[32][32];
 char flameTimer[32][32], tempweights[32][32];
 node* corr[32][32];
+
+int getMax()
+{
+	return mutare_maxima;
+}
 
 int init()
 {
@@ -201,11 +205,9 @@ void readMatrix()
 
 void sendMove(bool place, uint32_t movedir)
 {
-
-	uint32_t move = movedir | (place << 31);
-	char *buf = (char*)malloc (4);
-	sprintf(buf, "%d", move);
-	write(fd, buf, sizeof(uint32_t));
+	uint32_t move_p = (uint32_t)movedir | (place << 31);
+	write(fd, &currentmovement, sizeof(uint32_t));
+	write(fd, &move_p, sizeof(uint32_t));
 }
 
 bool operator<(const queueNode& L, const queueNode& R)
@@ -237,26 +239,26 @@ void calculateChainReaction()
 		Q.pop();
 		for(i=1;i<=6;++i)
 		{
-			if((matrix[current.x+i][current.y]&(1<<15))==1||(current.x+i > n)) break;
+			if((matrix[current.x+i][current.y]&(1<<15))!=0||(current.x+i > n)) break;
 
 			if(matrix[current.x+i][current.y]&(11111111<<24))
 				matrix[current.x+i][current.y] = (matrix[current.x][current.y]&(11111111<<24))+(1<<24);
 		}
 		for(i=-6;i<0;++i)
 		{
-			if((matrix[current.x+i][current.y]&(1<<15))==1||(current.x-i<0)) break;
+			if((matrix[current.x+i][current.y]&(1<<15))!=0||(current.x-i<0)) break;
 			if(matrix[current.x+i][current.y]&(11111111<<24))
 				matrix[current.x+i][current.y] = (matrix[current.x][current.y]&(11111111<<24))+(1<<24);
 		}
 		for(j=1;j<=6;++j)
 		{
-			if((matrix[current.x][current.y+j]&(1<<15))==1||(current.y+j>m)) break;
+			if((matrix[current.x][current.y+j]&(1<<15))!=0||(current.y+j>m)) break;
 			if(matrix[current.x][current.y+j]&(11111111<<24))
 				matrix[current.x][current.y+j] = (matrix[current.x][current.y]&(11111111<<24))+(1<<24);
 		}
 		for(j=-6;j<0;++j)
 		{
-			if((matrix[current.x][current.y+j]&(1<<15))==1||(current.y+j<0)) break;
+			if((matrix[current.x][current.y+j]&(1<<15))!=0||(current.y+j<0)) break;
 			if(matrix[current.x][current.y+j]&(11111111<<24))
 				matrix[current.x][current.y+j] = (matrix[current.x][current.y]&(11111111<<24))+(1<<24);
 		}
@@ -356,7 +358,7 @@ bool is_walkable(int time, node* currentNode) {
 			 flameTimer[currentNode->x][currentNode->y] + time <= 0);
 }
 
-void constructRoutes(node* currentNode, node* parent, int &maxweight, uint32_t &dir, int recursionlevel, int &depth)
+void constructRoutes(node* currentNode, node* parent, int &maxweight, int32_t &dir, int recursionlevel, int &depth)
 {
 	int weight = -120, i=-1, k;
 	if(rootNode == NULL || rootNode->kids.empty())
@@ -374,7 +376,7 @@ void constructRoutes(node* currentNode, node* parent, int &maxweight, uint32_t &
 		   currentNode->kids[k] != currentNode->parent&&
 		   tempweights[currentNode->kids[k]->x][currentNode->kids[k]->y] == -100)
 		{
-			uint32_t aux = (uint32_t)i;
+			int32_t aux = (int32_t)i;
 			constructRoutes(currentNode->kids[k], currentNode, weight, aux, recursionlevel+1, depth);
 
 			weight += currentNode->weight;
@@ -394,7 +396,7 @@ void constructRoutes(node* currentNode, node* parent, int &maxweight, uint32_t &
 	}
 }
 
-void playNormal(bool &place, uint32_t &movedir)
+void playNormal(bool &place, int32_t &movedir)
 {
 	int length, weight,i,j;
 	movedir = -1;
@@ -403,6 +405,7 @@ void playNormal(bool &place, uint32_t &movedir)
 		for(j=0; j<m; ++j)
 			tempweights[i][j] = -100;
 	constructRoutes(rootNode, NULL, weight, movedir, 1, length);
+	printf("%d",length);
 	if(length > 3)
 	{
 		place = length<=6;
@@ -413,7 +416,7 @@ void playNormal(bool &place, uint32_t &movedir)
 	int maxweight = -1;
 	j = movedir;
 	node tempNode, currNode;
-	place = 1;
+	place = 0;
 	weight = 0;
 	// euristica, n-as paria ca si mere dar fie...
 
@@ -434,17 +437,18 @@ int neighbors(node &n)
 {
 	int nr = 0;
 	node next;
-	int(i=0; i<4; ++i)
+	int i;
+	for(i=0; i<4; ++i)
 	{
 		next.x = n.x + dirx[i];
 		next.y = n.y + diry[i];
-		if(is_walkable(1, next))
+		if(is_walkable(1, &next))
 			++nr;
 	}
 	return 0;
 }
 
-void playAggresive(bool &place, int&movedir)
+void playAggresive(bool &place, int32_t& movedir)
 {
 	place = 0;
 	movedir = -1;
@@ -463,7 +467,7 @@ void playAggresive(bool &place, int&movedir)
 
 	while(!q.empty())
 	{
-		current = q.top();
+		current = q.front();
 		q.pop();
 
 		for(i=0; i<4; ++i)
@@ -472,12 +476,11 @@ void playAggresive(bool &place, int&movedir)
 			next.y = current.y + diry[i];
 			next.weight = current.weight + 1; //use weights as distances mmmkay
 			if(next.weight < 7 &&
-			   is_walkable(current->weight, next) && tempweights[next.x][next.y] == -100)
+			   is_walkable(current.weight, &next) && tempweights[next.x][next.y] == -100)
 			{
 				tempweights[next.x][next.y] = current.weight + 1;
-				if(next.x = currentx && next.y = currenty)
+				if(next.x == currentx && next.y == currenty)
 				{
-					q.clear();
 					break;
 				}
 				else {
@@ -485,10 +488,12 @@ void playAggresive(bool &place, int&movedir)
 				}
 			}
 		}
+		if (i != 4)
+			break;
 	}
 
 	for(i=0; i<4; ++i)
-		if(tempweights[currentx + dirx[i][currenty + diry[i]] == tempweights[currentx][currenty] - 1)
+		if(tempweights[currentx + dirx[i]][currenty + diry[i]] == tempweights[currentx][currenty] - 1)
 			movedir = i;
 
 	++movedir;
