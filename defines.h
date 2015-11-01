@@ -3,7 +3,9 @@
 #include <vector>
 #include <stdint.h>
 
-#define MAXWEIGHTKIDS 16
+#define MINWEIGHTKIDS 16
+#define BOMBRANGE -1
+#define FLAME -16
 
 using namespace std;
 
