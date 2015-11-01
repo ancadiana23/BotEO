@@ -69,7 +69,7 @@ void initializeRoutes() {
 	rootNode = new node;
 	rootNode->x = currentx;
 	rootNode->y = currenty;
-	rootNode->weight = MAXWEIGHTKIDS;
+	rootNode->weight = MINWEIGHTKIDS;
 	rootNode->parent = NULL;
 	corr[currentx][currenty] = rootNode;
 
@@ -89,24 +89,45 @@ void initializeRoutes() {
 				newNode = new node;
 				newNode->x = next.x;
 				newNode->y = next.y;
-				newNode->weight = MAXWEIGHTKIDS;
+				newNode->weight = MINWEIGHTKIDS;
 				newNode->parent = corr[current.x][current.y];
+				newNode->kids.push_back(newNode->parent);
 
-				corr[current.x][current.y]->weight /= 2;
+				corr[current.x][current.y]->weight *= 2;
                 corr[current.x][current.y]->kids.push_back(newNode);
 			}
 		}
 	}
 }
 
-void constructRoutes()
+bool is_walkable(int time, node* currentNode) {
+	return (matrix[currentNode->x][currentNode->y] &(11111111<<24)) == 0 &&
+			flameTimer[currentNode->x][currentNode->y] >= time;
+}
+
+void constructRoutes(node* currentNode, node* parent, char &maxweight, char &x, char &y, int recursionlevel)
 {
-	if(rootNode->kids.empty()) {
+	char weight = -120, i=-1, j=-1;
+	if(rootNode == NULL || rootNode->kids.empty())
+	{
 		initializeRoutes();
 		return;
 	}
 
-	rootNode = corr[currentx][currenty];
-	rootNode->kids.push_back(rootNode->parent);
-	rootNode->parent = NULL;
+	currentNode->parent = parent;
+
+	for(i=0; i<currentNode->kids.size(); ++i)
+	{
+		if(is_walkable(recursionlevel+1, currentNode->kids[i]) &&
+		   currentNode->kids[i] != currentNode->parent)
+		{
+			constructRoutes(currentNode->kids[i], currentNode, weight, i, j, recursionlevel+1);
+			if(weight > maxweight)
+			{
+				maxweight = weight;
+				x = i;
+				y = j;
+			}
+		}
+	}
 }
