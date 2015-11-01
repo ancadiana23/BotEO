@@ -27,9 +27,9 @@ void calculateChainReaction()
 	int i,j;
 	std::priority_queue<queueNode,vector<queueNode> > Q;
 	queueNode current;
-	for(int i=0;i<m;++i)
+	for(int i=0;i<n;++i)
 	{
-		for(int j=0;j<n;++j)
+		for(int j=0;j<m;++j)
 		{
 			if(matrix[i][j]&(11111111<<24))
 			{
@@ -73,9 +73,9 @@ void calculateChainReaction()
 void calculateFlameTimers()
 {
 	int i, j, ic, jc;
-	for(i=0;i<m;++i)
+	for(i=0;i<n;++i)
 	{
-		for(j=0;j<n;++j)
+		for(j=0;j<m;++j)
 		{
 			if(matrix[i][j]&(11111111<<24!=0))
 			{
