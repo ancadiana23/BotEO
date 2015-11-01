@@ -20,7 +20,8 @@ node* rootNode;
 
 int fd;
 int n, m, id, id_enemy;
-int currentx, currenty, enemyx, enemyy, currentmovement;
+int currentx, currenty, enemyx, enemyy;
+uint32_t currentmovement;
 int start_mod_agresiv, mutare_maxima;
 uint32_t matrix[32][32];
 char flameTimer[32][32], tempweights[32][32];
@@ -54,7 +55,7 @@ int init()
 	*/
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
-	currentmovement = (int) atoi(name);
+	currentmovement = (uint32_t) atoi(name);
 /*
 	if (receive < 0)
 	{
@@ -143,6 +144,7 @@ int init()
 		printf("\n");
 	}
 */
+printf("fd -- %d\n", fd);
 	return start_mod_agresiv;
 }
 
@@ -201,11 +203,9 @@ void readMatrix()
 
 void sendMove(bool place, uint32_t movedir)
 {
-	
-	uint32_t move = movedir | (place << 31);
-	char *buf = (char*)malloc (4);
-	sprintf(buf, "%d", move);
-	write(fd, buf, sizeof(uint32_t));
+	uint32_t move_p = (movedir & 111)| (place << 31);
+	write (fd, (void *)&currentmovement, sizeof(uint32_t));
+	write(fd, (void*)&move_p, sizeof(uint32_t));
 }
 
 bool operator<(const queueNode& L, const queueNode& R)
@@ -237,26 +237,26 @@ void calculateChainReaction()
 		Q.pop();
 		for(i=1;i<=6;++i)
 		{
-			if((matrix[current.x+i][current.y]&(1<<15))==1||(current.x+i > n)) break;
+			if((matrix[current.x+i][current.y]&(1<<15))!=0||(current.x+i > n)) break;
 
 			if(matrix[current.x+i][current.y]&(11111111<<24))
 				matrix[current.x+i][current.y] = (matrix[current.x][current.y]&(11111111<<24))+(1<<24);
 		}
 		for(i=-6;i<0;++i)
 		{
-			if((matrix[current.x+i][current.y]&(1<<15))==1||(current.x-i<0)) break;
+			if((matrix[current.x+i][current.y]&(1<<15))!=0||(current.x-i<0)) break;
 			if(matrix[current.x+i][current.y]&(11111111<<24))
 				matrix[current.x+i][current.y] = (matrix[current.x][current.y]&(11111111<<24))+(1<<24);
 		}
 		for(j=1;j<=6;++j)
 		{
-			if((matrix[current.x][current.y+j]&(1<<15))==1||(current.y+j>m)) break;
+			if((matrix[current.x][current.y+j]&(1<<15))!=0||(current.y+j>m)) break;
 			if(matrix[current.x][current.y+j]&(11111111<<24))
 				matrix[current.x][current.y+j] = (matrix[current.x][current.y]&(11111111<<24))+(1<<24);
 		}
 		for(j=-6;j<0;++j)
 		{
-			if((matrix[current.x][current.y+j]&(1<<15))==1||(current.y+j<0)) break;
+			if((matrix[current.x][current.y+j]&(1<<15))!=0||(current.y+j<0)) break;
 			if(matrix[current.x][current.y+j]&(11111111<<24))
 				matrix[current.x][current.y+j] = (matrix[current.x][current.y]&(11111111<<24))+(1<<24);
 		}

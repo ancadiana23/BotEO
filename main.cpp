@@ -12,8 +12,6 @@ int main(int argc, char * argv[])
 		calculateChainReaction();
 		calculateFlameTimers();
 		playNormal(place, movedir);
-		//place = i%2;
-		//movedir = (uint32_t)i%5;
 		sendMove(place, movedir);
 		readMatrix();
 	}
