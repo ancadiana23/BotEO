@@ -5,7 +5,7 @@
 
 #define MINWEIGHTKIDS 1
 #define BOMBRANGE -1
-#define OPPONENT VALUE 16
+#define ENEMYVALUE 16
 
 using namespace std;
 

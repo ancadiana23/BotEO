@@ -7,7 +7,7 @@
 #include <queue>
 #include <string.h>
 #include <sys/types.h>
-#include <sys/socket.h> 
+#include <sys/socket.h>
 #include <unistd.h>
 
 
@@ -35,7 +35,7 @@ void init()
 	if(fd < 0) {
 		return;
 	}
-	
+
 	to_station.sin_family = AF_INET;
 
 	to_station.sin_port = htons(SERVER_PORT);
@@ -46,7 +46,7 @@ void init()
 
 	int receive;
 	char * name = (char *)malloc(4);
-	
+
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
 	id = (int) atoi(name);
@@ -54,11 +54,11 @@ void init()
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
 	currentmovement = (int) atoi(name);
-	
+
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
 	start_mod_agresiv = (int) atoi(name);
-	
+
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
 	mutare_maxima = (int) atoi(name);
@@ -66,7 +66,7 @@ void init()
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
 	n = (int) atoi(name);
-	
+
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
 	m = (int) atoi(name);
@@ -76,10 +76,10 @@ void init()
 	{
 		for (j = 0; j < m; j++)
 		{
-			receive = recv(fd, &buf, 4, 0);	
+			receive = recv(fd, &buf, 4, 0);
 			sprintf(name, "%d", buf);
 			matrix[i][j] = (uint32_t) atoi(name);
-			
+
 			int aux = matrix[i][j];
 			int k;
 			for (k = 1; k <= 8 ;k++)
@@ -99,9 +99,9 @@ void init()
 					}
 				}
 				aux = aux >> 1;
-			}			
+			}
 		}
-	}	
+	}
 }
 
 void close_connection()
@@ -114,20 +114,20 @@ void readMatrix()
 	int receive;
 	char * name = (char *)malloc(4);
 	char *buf = (char*)calloc (4, 1);
-	 
+
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
 	currentmovement = (int) atoi(name);
-	
+
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
 	start_mod_agresiv = (int) atoi(name);
-	
+
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
 	mutare_maxima = (int) atoi(name);
-	
-	
+
+
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
 	n = (int) atoi(name);
@@ -135,16 +135,16 @@ void readMatrix()
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
 	m = (int) atoi(name);
-	
+
 	int i,j;
 	for (i = 0; i < n ;i++)
 	{
 		for (j = 0; j < m; j++)
 		{
-			receive = recv(fd, &buf, 4, 0);	
+			receive = recv(fd, &buf, 4, 0);
 			sprintf(name, "%d", buf);
 			matrix[i][j] = (uint32_t) atoi(name);
-			
+
 			if (matrix[i][j] & 1 << id)
 			{
 				currentx = i;
@@ -322,6 +322,8 @@ void constructRoutes(node* currentNode, node* parent, char &maxweight, char &x, 
 
 			if(flameTimer[currentNode->x][curretNode->y])
 				weight += BOMBRANGE;
+			if(currentNode->x == enemyx && currentNode->y == enemyy)
+				weight += ENEMYVALUE;
 
 			if(weight > maxweight)
 			{
