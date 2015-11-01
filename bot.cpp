@@ -325,6 +325,7 @@ void initializeRoutes() {
 	{
 		current = q.front();
 		q.pop();
+		printf("%d ", q.size());
 
 		for(i=0; i<4; ++i)
 		{
@@ -397,7 +398,7 @@ void constructRoutes(node* currentNode, node* parent, int &maxweight, int &dir, 
 
 void playNormal(bool &place, int &movedir)
 {
-	int length, weight;
+	int length, weight,i,j;
 	movedir = -1;
 
 	for(i=0; i<n; ++i)
