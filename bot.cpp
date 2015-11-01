@@ -333,15 +333,17 @@ void initializeRoutes() {
 			if((matrix[next.x][next.y]&(1<<15)) == 0)
 			{
 				q.push(next);
-
-				newNode = new node;
-				newNode->x = next.x;
-				newNode->y = next.y;
-				newNode->weight = MINWEIGHTKIDS;
-				newNode->parent = corr[current.x][current.y];
-				newNode->kids.push_back(newNode->parent);
+				if(corr[next.x][next.y]==NULL)
+				{
+					newNode = new node;
+					newNode->x = next.x;
+					newNode->y = next.y;
+					newNode->weight = MINWEIGHTKIDS;
+					newNode->parent = corr[current.x][current.y];
+					newNode->kids.push_back(newNode->parent);
+					corr[next.x][next.y] = newNode;
+				}
 				
-				corr[next.x][next.y] = newNode;
 				corr[current.x][current.y]->weight *= 2;
                 corr[current.x][current.y]->kids.push_back(newNode);
 			}
