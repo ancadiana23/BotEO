@@ -2,8 +2,11 @@
 #define BOT_H_INCLUDED
 
 #include "defines.h"
+#include <stdio.h>
 #include <stdlib.h>
 
+void init();
+void close_connection();
 void readMatrix();//uint32_t matrix[32][32], int& n, int& m
 	// Hai ca o fac acum repede pana termina Anca cu scripturile
 	// ar trebui sa arate ca in enunt
@@ -21,5 +24,8 @@ void constructRoutes(); //uint32_t matrix[32][32], int n, int m,  node* corr[32]
 void playNormal();
 
 void playAggresive(); //okay nu stiu inca diferenta prea tare dar ceva imi spune ca o sa avem nevoie
+
+#define SERVER_PORT 10000
+#define SERVER_IP   "192.168.56.101"
 
 #endif

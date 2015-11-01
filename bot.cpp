@@ -1,22 +1,163 @@
 #include "bot.h"
+
+#include <arpa/inet.h>
+#include <fcntl.h>
+#include <iostream>
+#include <netdb.h>
 #include <queue>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/socket.h> 
+#include <unistd.h>
+
+
+
 
 int dirx[] = {-1, 0, 1,  0},
 	diry[] = { 0, 1, 0, -1};
 
 node* rootNode;
 
-int n, m;
-int currentx, currenty, currentmovement;
+int fd;
+int n, m, id, id_enemy;
+int currentx, currenty, enemyx, enemyy, currentmovement;
+int start_mod_agresiv, mutare_maxima;
 uint32_t matrix[32][32];
 char flameTimer[32][32];
 node* corr[32][32];
 
-void readMatrix()
+void init()
 {
+	struct sockaddr_in to_station = {0};
+	char *buf = (char*)calloc (4, 1);
+	int fd = socket(AF_INET, SOCK_STREAM, 0);
 
+	if(fd < 0) {
+		return;
+	}
+	
+	to_station.sin_family = AF_INET;
+
+	to_station.sin_port = htons(SERVER_PORT);
+
+	(inet_aton(SERVER_IP, &(to_station.sin_addr)));
+
+	int connected = connect(fd, (struct sockaddr *)&to_station, sizeof(to_station));
+
+	int receive;
+	char * name = (char *)malloc(4);
+	
+	receive = recv(fd, &buf, 4, 0);
+	sprintf(name, "%d", buf);
+	id = (int) atoi(name);
+
+	receive = recv(fd, &buf, 4, 0);
+	sprintf(name, "%d", buf);
+	currentmovement = (int) atoi(name);
+	
+	receive = recv(fd, &buf, 4, 0);
+	sprintf(name, "%d", buf);
+	start_mod_agresiv = (int) atoi(name);
+	
+	receive = recv(fd, &buf, 4, 0);
+	sprintf(name, "%d", buf);
+	mutare_maxima = (int) atoi(name);
+
+	receive = recv(fd, &buf, 4, 0);
+	sprintf(name, "%d", buf);
+	n = (int) atoi(name);
+	
+	receive = recv(fd, &buf, 4, 0);
+	sprintf(name, "%d", buf);
+	m = (int) atoi(name);
+
+	int i,j;
+	for (i = 0; i < n ;i++)
+	{
+		for (j = 0; j < m; j++)
+		{
+			receive = recv(fd, &buf, 4, 0);	
+			sprintf(name, "%d", buf);
+			matrix[i][j] = (uint32_t) atoi(name);
+			
+			int aux = matrix[i][j];
+			int k;
+			for (k = 1; k <= 8 ;k++)
+			{
+				if (aux % 2 == 1)
+				{
+					if (k == id)
+					{
+						currentx = i;
+						currenty = j;
+					}
+					else
+					{
+						id_enemy = k;
+						enemyx = i;
+						enemyy = j;
+					}
+				}
+				aux = aux >> 1;
+			}			
+		}
+	}	
 }
 
+void close_connection()
+{
+	close(fd);
+}
+
+void readMatrix()
+{
+	int receive;
+	char * name = (char *)malloc(4);
+	char *buf = (char*)calloc (4, 1);
+	 
+	receive = recv(fd, &buf, 4, 0);
+	sprintf(name, "%d", buf);
+	currentmovement = (int) atoi(name);
+	
+	receive = recv(fd, &buf, 4, 0);
+	sprintf(name, "%d", buf);
+	start_mod_agresiv = (int) atoi(name);
+	
+	receive = recv(fd, &buf, 4, 0);
+	sprintf(name, "%d", buf);
+	mutare_maxima = (int) atoi(name);
+	
+	
+	receive = recv(fd, &buf, 4, 0);
+	sprintf(name, "%d", buf);
+	n = (int) atoi(name);
+
+	receive = recv(fd, &buf, 4, 0);
+	sprintf(name, "%d", buf);
+	m = (int) atoi(name);
+	
+	int i,j;
+	for (i = 0; i < n ;i++)
+	{
+		for (j = 0; j < m; j++)
+		{
+			receive = recv(fd, &buf, 4, 0);	
+			sprintf(name, "%d", buf);
+			matrix[i][j] = (uint32_t) atoi(name);
+			
+			if (matrix[i][j] & 1 << id)
+			{
+				currentx = i;
+				currenty = j;
+			}
+			if (matrix[i][j] & 1 << id_enemy)
+			{
+				enemyx = i;
+				enemyy = j;
+			}
+		}
+	}
+}
 void calculateFlameTimers()
 {
 	int i, j, ic, jc;
