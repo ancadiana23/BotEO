@@ -28,10 +28,9 @@ node* corr[32][32];
 
 int init()
 {
-	printf("1 ");
 	struct sockaddr_in to_station = {0};
 	char *buf = (char*)calloc (4, sizeof(char));
-	int fd = socket(AF_INET, SOCK_STREAM, 0);
+	fd = socket(AF_INET, SOCK_STREAM, 0);
 
 	to_station.sin_family = AF_INET;
 
@@ -62,9 +61,10 @@ int init()
 		printf("Cannot receive curr_mov");
 	}
 	*/
-	receive = recv(fd, &buf, 4, 0);
-	sprintf(name, "%d", buf);
-	start_mod_agresiv = (int) atoi(name);
+	receive = recv(fd, &start_mod_agresiv, 4, 0);
+	//printf("%d", start_mod_agresiv);
+	//sprintf(name, "%d", buf);
+	//start_mod_agresiv = (int) atoi(name);
 /*
 	if (receive < 0)
 	{
@@ -92,6 +92,7 @@ int init()
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
 	m = (int) atoi(name);
+	printf("%d   %d\n", n, m);
 /*
 	if (receive < 0)
 	{
@@ -143,7 +144,6 @@ int init()
 	}
 */	
 	return start_mod_agresiv;
-//	return 2;
 }
 
 void close_connection()
@@ -156,28 +156,25 @@ void readMatrix()
 {
 	int receive;
 	char * name = (char *)malloc(4);
-	char *buf = (char*)calloc (4, 1);
+	char *buf = (char*)calloc (4, sizeof(char));
 
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
-	currentmovement = (int) atoi(name);
+	currentmovement = (uint32_t) atoi(name);
 
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
-	start_mod_agresiv = (int) atoi(name);
+	start_mod_agresiv = (uint32_t) atoi(name);
 
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
-	mutare_maxima = (int) atoi(name);
+	mutare_maxima = (uint32_t) atoi(name);
 
 
-	receive = recv(fd, &buf, 4, 0);
-	sprintf(name, "%d", buf);
-	n = (int) atoi(name);
+	receive = recv(fd, &n, 4, 0);
 
-	receive = recv(fd, &buf, 4, 0);
-	sprintf(name, "%d", buf);
-	m = (int) atoi(name);
+
+	receive = recv(fd, &m, 4, 0);
 
 	int i,j;
 	for (i = 0; i < n ;i++)
@@ -188,12 +185,12 @@ void readMatrix()
 			sprintf(name, "%d", buf);
 			matrix[i][j] = (uint32_t) atoi(name);
 
-			if (matrix[i][j] & 1 << id)
+			if (matrix[i][j] & (1 << id))
 			{
 				currentx = i;
 				currenty = j;
 			}
-			if (matrix[i][j] & 1 << id_enemy)
+			if (matrix[i][j] & (1 << id_enemy))
 			{
 				enemyx = i;
 				enemyy = j;
@@ -208,6 +205,7 @@ void sendMove(bool place, int movedir)
 	char *buf = (char*)calloc (4, 1);
 	sprintf(buf, "%d", move);
 	write(fd, buf, sizeof(buf));
+	printf("%d",movedir);
 }
 
 bool operator<(const queueNode& L, const queueNode& R)
@@ -325,7 +323,6 @@ void initializeRoutes() {
 	{
 		current = q.front();
 		q.pop();
-		printf("%d ", q.size());
 
 		for(i=0; i<4; ++i)
 		{
@@ -367,7 +364,7 @@ void constructRoutes(node* currentNode, node* parent, int &maxweight, int &dir, 
 		initializeRoutes();
 		return;
 	}
-/*
+	
 	currentNode->parent = parent;
 	tempweights[currentNode->x][currentNode->y] = 0;
 
@@ -393,7 +390,7 @@ void constructRoutes(node* currentNode, node* parent, int &maxweight, int &dir, 
 				depth = recursionlevel + 1;
 			}
 		}
-	}*/
+	}
 }
 
 void playNormal(bool &place, int &movedir)
@@ -405,7 +402,7 @@ void playNormal(bool &place, int &movedir)
 		for(j=0; j<m; ++j)
 			tempweights[i][j] = -100;
 	constructRoutes(rootNode, NULL, weight, movedir, 1, length);
-	/*if(length > 3)
+	if(length > 3)
 	{
 		place = length<=6;
 		++movedir;
@@ -422,13 +419,13 @@ void playNormal(bool &place, int &movedir)
 	{
 		currNode.x = rootNode->x + dirx[i];
 		currNode.y = rootNode->y + diry[i];
-		if(is_walkable(1, &currNode) && tempweights[currNode->x][currNode->y] > maxweight)
+		if(is_walkable(1, &currNode) && tempweights[currNode.x][currNode.y] > maxweight)
 		{
 			maxweight = weight;
 			movedir = i;
 		}
 	}
-	++movedir;*/
+	++movedir;
 }
 
 void playAggresive(bool &place, int&movedir) {
