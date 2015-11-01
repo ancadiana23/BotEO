@@ -337,22 +337,25 @@ void constructRoutes(node* currentNode, node* parent, char &maxweight, char &x, 
 	}
 }
 
-void playNormal()
+void playNormal(bool &place, int &x, int &y)
 {
 	int length, movex, movey, weight;
 
 	constructRoutes(rootNode, NULL, weight, movex, movey, 1, length);
 	if(length > 6)
 	{
-		// transmitem movex, movey --- how the fuck do I do that
+		place = 0;
+		x = movex;
+		y = movey;
+		return;
 	}
-	else
-		if(length < 3)
-		{
-			// fugim si lasam bomba
-		}
-		else
-		{
-			//dracu stie
-		}
+	if(length < 3)
+	{
+		place = 1;
+		//magic
+		return;
+	}
+
+	//dracu stie :-"
+
 }
