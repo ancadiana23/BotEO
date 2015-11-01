@@ -304,7 +304,7 @@ inline bool is_walkable(int time, node* currentNode) {
 
 void constructRoutes(node* currentNode, node* parent, char &maxweight, char &x, char &y, int recursionlevel)
 {
-	char weight = -120, i=-1, j=-1;
+	char weight = -120, i=-1, j=-1, k;
 	if(rootNode == NULL || rootNode->kids.empty())
 	{
 		initializeRoutes();
@@ -313,12 +313,16 @@ void constructRoutes(node* currentNode, node* parent, char &maxweight, char &x, 
 
 	currentNode->parent = parent;
 
-	for(i=0; i<currentNode->kids.size(); ++i)
+	for(k=0; k<currentNode->kids.size(); ++k)
 	{
-		if(is_walkable(recursionlevel+1, currentNode->kids[i]) &&
-		   currentNode->kids[i] != currentNode->parent)
+		if(is_walkable(recursionlevel+1, currentNode->kids[k]) &&
+		   currentNode->kids[k] != currentNode->parent)
 		{
-			constructRoutes(currentNode->kids[i], currentNode, weight, i, j, recursionlevel+1);
+			constructRoutes(currentNode->kids[k], currentNode, weight, i, j, recursionlevel+1);
+
+			if(flameTimer[currentNode->x][curretNode->y])
+				weight += BOMBRANGE;
+
 			if(weight > maxweight)
 			{
 				maxweight = weight;

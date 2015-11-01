@@ -3,9 +3,9 @@
 #include <vector>
 #include <stdint.h>
 
-#define MINWEIGHTKIDS 16
+#define MINWEIGHTKIDS 1
 #define BOMBRANGE -1
-#define FLAME -16
+#define OPPONENT VALUE 16
 
 using namespace std;
 
