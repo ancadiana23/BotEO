@@ -201,7 +201,7 @@ void readMatrix()
 
 void sendMove(bool place, uint32_t movedir)
 {
-
+	
 	uint32_t move = movedir | (place << 31);
 	char *buf = (char*)malloc (4);
 	sprintf(buf, "%d", move);
@@ -430,6 +430,7 @@ void playNormal(bool &place, uint32_t &movedir)
 	++movedir;
 }
 
+<<<<<<< HEAD
 int neighbors(node &n)
 {
 	int nr = 0;
@@ -492,6 +493,11 @@ void playAggresive(bool &place, int&movedir)
 			movedir = i;
 
 	++movedir;
+=======
+void playAggresive(bool &place, uint32_t &movedir) {
+	//nota: cand suntem aproape de adversar, tactica ar trebui sa fie aceeasi ca la play aggressive
+	//care e tactica asta...yeah idk
+>>>>>>> origin/master
 }
 
 void cleanup()
