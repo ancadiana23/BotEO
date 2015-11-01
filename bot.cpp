@@ -332,9 +332,9 @@ void initializeRoutes() {
 			next.y = current.y + diry[i];
 			if((matrix[next.x][next.y]&(1<<15)) == 0)
 			{
-				q.push(next);
 				if(corr[next.x][next.y]==NULL)
 				{
+					q.push(next);
 					newNode = new node;
 					newNode->x = next.x;
 					newNode->y = next.y;
