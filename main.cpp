@@ -2,9 +2,9 @@
 
 int main(int argc, char * argv[])
 {
-	int i;
+	uint32_t i;
 	bool place;
-	int movedir;
+	uint32_t movedir;
 	int start_mod_agresiv = init();
 	printf("%d mod agresiv\n", start_mod_agresiv);
 	for (i = 0; i < start_mod_agresiv; i++)
@@ -12,6 +12,8 @@ int main(int argc, char * argv[])
 		calculateChainReaction();
 		calculateFlameTimers();
 		playNormal(place, movedir);
+		//place = i%2;
+		//movedir = (uint32_t)i%5;
 		sendMove(place, movedir);
 		readMatrix();
 	}
