@@ -199,13 +199,13 @@ void readMatrix()
 	}
 }
 
-void sendMove(bool place, int movedir)
+void sendMove(bool place, uint32_t movedir)
 {
-	int move = movedir | (place << 31);
-	char *buf = (char*)calloc (4, 1);
+	
+	uint32_t move = movedir | (place << 31);
+	char *buf = (char*)malloc (4);
 	sprintf(buf, "%d", move);
-	write(fd, buf, sizeof(buf));
-	printf("%d",movedir);
+	write(fd, buf, sizeof(uint32_t));
 }
 
 bool operator<(const queueNode& L, const queueNode& R)
@@ -356,7 +356,7 @@ bool is_walkable(int time, node* currentNode) {
 			 flameTimer[currentNode->x][currentNode->y] + time <= 0);
 }
 
-void constructRoutes(node* currentNode, node* parent, int &maxweight, int &dir, int recursionlevel, int &depth)
+void constructRoutes(node* currentNode, node* parent, int &maxweight, uint32_t &dir, int recursionlevel, int &depth)
 {
 	int weight = -120, i=-1, k;
 	if(rootNode == NULL || rootNode->kids.empty())
@@ -374,7 +374,8 @@ void constructRoutes(node* currentNode, node* parent, int &maxweight, int &dir, 
 		   currentNode->kids[k] != currentNode->parent&&
 		   tempweights[currentNode->kids[k]->x][currentNode->kids[k]->y] == -100)
 		{
-			constructRoutes(currentNode->kids[k], currentNode, weight, i, recursionlevel+1, depth);
+			uint32_t aux = (uint32_t)i;
+			constructRoutes(currentNode->kids[k], currentNode, weight, aux, recursionlevel+1, depth);
 
 			weight += currentNode->weight;
 			if(flameTimer[currentNode->x][currentNode->y])
@@ -393,7 +394,7 @@ void constructRoutes(node* currentNode, node* parent, int &maxweight, int &dir, 
 	}
 }
 
-void playNormal(bool &place, int &movedir)
+void playNormal(bool &place, uint32_t &movedir)
 {
 	int length, weight,i,j;
 	movedir = -1;
@@ -429,6 +430,7 @@ void playNormal(bool &place, int &movedir)
 	++movedir;
 }
 
+<<<<<<< HEAD
 int neighbors(node &n)
 {
 	int nr = 0;
@@ -491,6 +493,11 @@ void playAggresive(bool &place, int&movedir)
 			movedir = i;
 
 	++movedir;
+=======
+void playAggresive(bool &place, uint32_t &movedir) {
+	//nota: cand suntem aproape de adversar, tactica ar trebui sa fie aceeasi ca la play aggressive
+	//care e tactica asta...yeah idk
+>>>>>>> origin/master
 }
 
 void cleanup()
