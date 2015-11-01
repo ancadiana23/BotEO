@@ -302,7 +302,7 @@ inline bool is_walkable(int time, node* currentNode) {
 			 flameTimer[currentNode->x][currentNode->y] + time <= 0);
 }
 
-void constructRoutes(node* currentNode, node* parent, char &maxweight, char &x, char &y, int recursionlevel)
+void constructRoutes(node* currentNode, node* parent, char &maxweight, char &x, char &y, int recursionlevel, int &depth)
 {
 	char weight = -120, i=-1, j=-1, k;
 	if(rootNode == NULL || rootNode->kids.empty())
@@ -320,6 +320,7 @@ void constructRoutes(node* currentNode, node* parent, char &maxweight, char &x, 
 		{
 			constructRoutes(currentNode->kids[k], currentNode, weight, i, j, recursionlevel+1);
 
+			weight += currentNode->weight;
 			if(flameTimer[currentNode->x][curretNode->y])
 				weight += BOMBRANGE;
 			if(currentNode->x == enemyx && currentNode->y == enemyy)
@@ -330,7 +331,28 @@ void constructRoutes(node* currentNode, node* parent, char &maxweight, char &x, 
 				maxweight = weight;
 				x = i;
 				y = j;
+				depth = recursionlevel + 1;
 			}
 		}
 	}
+}
+
+void playNormal()
+{
+	int length, movex, movey, weight;
+
+	constructRoutes(rootNode, NULL, weight, movex, movey, 1, length);
+	if(length > 6)
+	{
+		// transmitem movex, movey --- how the fuck do I do that
+	}
+	else
+		if(length < 3)
+		{
+			// fugim si lasam bomba
+		}
+		else
+		{
+			//dracu stie
+		}
 }
