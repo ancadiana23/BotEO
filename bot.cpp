@@ -23,7 +23,7 @@ int n, m, id, id_enemy;
 int currentx, currenty, enemyx, enemyy, currentmovement;
 int start_mod_agresiv, mutare_maxima;
 uint32_t matrix[32][32];
-char flameTimer[32][32];
+char flameTimer[32][32], tempweights[32][32];
 node* corr[32][32];
 
 int init()
@@ -368,11 +368,13 @@ void constructRoutes(node* currentNode, node* parent, int &maxweight, int &dir, 
 	}
 /*
 	currentNode->parent = parent;
+	tempweights[currentNode->x][currentNode->y] = 0;
 
 	for(k=0; k<currentNode->kids.size(); ++k)
 	{
 		if(is_walkable(recursionlevel+1, currentNode->kids[k]) &&
-		   currentNode->kids[k] != currentNode->parent)
+		   currentNode->kids[k] != currentNode->parent&&
+		   tempweights[currentNode->kids[k]->x][currentNode->kids[k]->y] == -100)
 		{
 			constructRoutes(currentNode->kids[k], currentNode, weight, i, recursionlevel+1, depth);
 
@@ -381,6 +383,7 @@ void constructRoutes(node* currentNode, node* parent, int &maxweight, int &dir, 
 				weight += BOMBRANGE;
 			if(currentNode->x == enemyx && currentNode->y == enemyy)
 				weight += ENEMYVALUE;
+			tempweights[currentNode->x][currentNode->y] = weight;
 
 			if(weight > maxweight)
 			{
@@ -397,6 +400,9 @@ void playNormal(bool &place, int &movedir)
 	int length, weight;
 	movedir = -1;
 
+	for(i=0; i<n; ++i)
+		for(j=0; j<m; ++j)
+			tempweights[i][j] = -100;
 	constructRoutes(rootNode, NULL, weight, movedir, 1, length);
 	/*if(length > 3)
 	{
@@ -415,15 +421,7 @@ void playNormal(bool &place, int &movedir)
 	{
 		currNode.x = rootNode->x + dirx[i];
 		currNode.y = rootNode->y + diry[i];
-		if(is_walkable(1, &currNode));
-			for(int j=0; j<4; ++j)
-			{
-				tempNode.x = currNode.x + dirx[j];
-				tempNode.y = currNode.y + diry[j];
-				if(is_walkable(2, &tempNode))
-					++weight;
-			}
-		if(weight > maxweight)
+		if(is_walkable(1, &currNode) && tempweights[currNode->x][currNode->y] > maxweight)
 		{
 			maxweight = weight;
 			movedir = i;
