@@ -28,13 +28,18 @@ node* corr[32][32];
 
 void init()
 {
+	printf("%s" "buu");
 	struct sockaddr_in to_station = {0};
 	char *buf = (char*)calloc (4, 1);
 	int fd = socket(AF_INET, SOCK_STREAM, 0);
-
+	
+	printf("%s" "buu");
+	
 	if(fd < 0) {
 		return;
 	}
+	
+	
 	
 	to_station.sin_family = AF_INET;
 
@@ -42,8 +47,19 @@ void init()
 
 	(inet_aton(SERVER_IP, &(to_station.sin_addr)));
 
+	
+/*	char *addr = (char *)malloc(14);
+	const size_t x = 14;
+	sprintf(addr, "%s", SERVER_IP);
+	
+	bzero(&addr, x); 
+	*/
+	
+	printf("%s" ,"buu");
 	int connected = connect(fd, (struct sockaddr *)&to_station, sizeof(to_station));
 
+	printf("Connect %d", connect);
+	
 	int receive;
 	char * name = (char *)malloc(4);
 	
@@ -102,6 +118,15 @@ void init()
 			}			
 		}
 	}	
+	printf("%d %d %d \n", id, n, m);
+	for (i = 0; i < n;i++)
+	{
+		for (j = 0; j < m; j++)
+		{
+			printf("%d ", matrix[i][j]);
+		}
+		printf("\n");
+	}
 }
 
 void close_connection()
