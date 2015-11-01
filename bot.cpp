@@ -13,8 +13,8 @@
 
 
 
-int dirx[] = {-1, 0, 1,  0},
-	diry[] = { 0, 1, 0, -1};
+int dirx[] = {0, -1,  0,  1},
+	diry[] = {1,  0, -1, 0};
 
 node* rootNode;
 
@@ -32,9 +32,9 @@ void init()
 	struct sockaddr_in to_station = {0};
 	char *buf = (char*)calloc (4, 1);
 	int fd = socket(AF_INET, SOCK_STREAM, 0);
-	
+
 	printf("%s" "buu");
-	
+
 	if(fd < 0) {
 		return;
 	}
@@ -45,19 +45,19 @@ void init()
 
 	(inet_aton(SERVER_IP, &(to_station.sin_addr)));
 
-	
+
 /*	char *addr = (char *)malloc(14);
 	const size_t x = 14;
 	sprintf(addr, "%s", SERVER_IP);
-	
-	bzero(&addr, x); 
+
+	bzero(&addr, x);
 	*/
-	
+
 	printf("%s" ,"buu");
 	int connected = connect(fd, (struct sockaddr *)&to_station, sizeof(to_station));
 
 	printf("Connect %d", connect);
-	
+
 	int receive;
 	char * name = (char *)malloc(4);
 
@@ -115,7 +115,7 @@ void init()
 				aux = aux >> 1;
 			}
 		}
-	}	
+	}
 	printf("%d %d %d \n", id, n, m);
 	for (i = 0; i < n;i++)
 	{
@@ -210,27 +210,27 @@ void calculateChainReaction()
 		Q.pop();
 		for(i=1;i<=6;++i)
 		{
-			if((matrix[current.x+i][current.y]&((1<<15)==1))||(current.x+i>m)) break;
+			if((matrix[current.x+i][current.y]&(1<<15))==1||(current.x+i>m)) break;
 			if(matrix[current.x+i][current.y]&(11111111<<24))
-				matrix[current.x+i][current.y] = matrix[current.x][current.y]&(11111111<<24)+1<<24;
+				matrix[current.x+i][current.y] = (matrix[current.x][current.y]&(11111111<<24))+(1<<24);
 		}
 		for(i=-6;i<0;++i)
 		{
-			if((matrix[current.x+i][current.y]&((1<<15)==1))||(current.x-i<0)) break;
+			if((matrix[current.x+i][current.y]&(1<<15))==1||(current.x-i<0)) break;
 			if(matrix[current.x+i][current.y]&(11111111<<24))
-				matrix[current.x+i][current.y] = matrix[current.x][current.y]&(11111111<<24)+1<<24;
+				matrix[current.x+i][current.y] = (matrix[current.x][current.y]&(11111111<<24))+(1<<24);
 		}
 		for(j=1;j<=6;++j)
 		{
-			if((matrix[current.x][current.y+j]&(1<<15==1))||(current.y+j>n)) break;
+			if((matrix[current.x][current.y+j]&(1<<15))==1||(current.y+j>n)) break;
 			if(matrix[current.x][current.y+j]&(11111111<<24))
-				matrix[current.x][current.y+j] = matrix[current.x][current.y]&(11111111<<24)+1<<24;
+				matrix[current.x][current.y+j] = (matrix[current.x][current.y]&(11111111<<24))+(1<<24);
 		}
 		for(j=-6;j<0;++j)
 		{
-			if((matrix[current.x][current.y+j]&(1<<15)==1)||(current.y+j<0)) break;
+			if((matrix[current.x][current.y+j]&(1<<15))==1||(current.y+j<0)) break;
 			if(matrix[current.x][current.y+j]&(11111111<<24))
-				matrix[current.x][current.y+j] = matrix[current.x][current.y]&(11111111<<24)+1<<24;
+				matrix[current.x][current.y+j] = (matrix[current.x][current.y]&(11111111<<24))+(1<<24);
 		}
 	}
 }
@@ -325,9 +325,9 @@ bool is_walkable(int time, node* currentNode) {
 			 flameTimer[currentNode->x][currentNode->y] + time <= 0);
 }
 
-void constructRoutes(node* currentNode, node* parent, char &maxweight, int &dir, int recursionlevel, int &depth)
+void constructRoutes(node* currentNode, node* parent, int &maxweight, int &dir, int recursionlevel, int &depth)
 {
-	char weight = -120, i=-1, k;
+	int weight = -120, i=-1, k;
 	if(rootNode == NULL || rootNode->kids.empty())
 	{
 		initializeRoutes();
@@ -341,10 +341,10 @@ void constructRoutes(node* currentNode, node* parent, char &maxweight, int &dir,
 		if(is_walkable(recursionlevel+1, currentNode->kids[k]) &&
 		   currentNode->kids[k] != currentNode->parent)
 		{
-			constructRoutes(currentNode->kids[k], currentNode, weight, i, recursionlevel+1);
+			constructRoutes(currentNode->kids[k], currentNode, weight, i, recursionlevel+1, depth);
 
 			weight += currentNode->weight;
-			if(flameTimer[currentNode->x][curretNode->y])
+			if(flameTimer[currentNode->x][currentNode->y])
 				weight += BOMBRANGE;
 			if(currentNode->x == enemyx && currentNode->y == enemyy)
 				weight += ENEMYVALUE;
@@ -361,16 +361,18 @@ void constructRoutes(node* currentNode, node* parent, char &maxweight, int &dir,
 
 void playNormal(bool &place, int &movedir)
 {
-	int length, movedir = 0, weight;
+	int length, weight;
+	movedir = -1;
 
-	constructRoutes(rootNode, NULL, weight, movex, movey, 1, length);
+	constructRoutes(rootNode, NULL, weight, movedir, 1, length);
 	if(length > 3)
 	{
 		place = length<=6;
+		++movedir;
 		return;
 	}
 
-	int i, weight, maxweight = -1, maxi=-1;
+	int maxweight = -1;
 	node tempNode, currNode;
 	place = 1;
 	weight = 0;
@@ -380,12 +382,12 @@ void playNormal(bool &place, int &movedir)
 	{
 		currNode.x = rootNode->x + dirx[i];
 		currNode.y = rootNode->y + diry[i];
-		if(is_walkable(1, currNode));
-			for(j=1; j<4; ++j)
+		if(is_walkable(1, &currNode));
+			for(int j=1; j<4; ++j)
 			{
-				tempNode.x = currNode->x + dirx[j];
-				tempNode.y = currNode->y + diry[j];
-				if(is_walkable(2, tempNode))
+				tempNode.x = currNode.x + dirx[j];
+				tempNode.y = currNode.y + diry[j];
+				if(is_walkable(2, &tempNode))
 				++weight;
 			}
 		if(weight > maxweight)
@@ -394,4 +396,9 @@ void playNormal(bool &place, int &movedir)
 			movedir = i;
 		}
 	}
+	++movedir;
+}
+
+void playAggresive(bool &place, int&movedir) {
+
 }
