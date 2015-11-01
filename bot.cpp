@@ -318,16 +318,16 @@ void initializeRoutes() {
 	}
 }
 
-inline bool is_walkable(int time, node* currentNode) {
+bool is_walkable(int time, node* currentNode) {
 	return  (matrix[currentNode->x][currentNode->y] &(11111111<<24)) == 0 &&
 			(matrix[currentNode->x][currentNode->y] &(11111111<<16)) == 0 &&
 			(flameTimer[currentNode->x][currentNode->y] == 0 ||
 			 flameTimer[currentNode->x][currentNode->y] + time <= 0);
 }
 
-void constructRoutes(node* currentNode, node* parent, char &maxweight, char &x, char &y, int recursionlevel, int &depth)
+void constructRoutes(node* currentNode, node* parent, char &maxweight, int &dir, int recursionlevel, int &depth)
 {
-	char weight = -120, i=-1, j=-1, k;
+	char weight = -120, i=-1, k;
 	if(rootNode == NULL || rootNode->kids.empty())
 	{
 		initializeRoutes();
@@ -341,7 +341,7 @@ void constructRoutes(node* currentNode, node* parent, char &maxweight, char &x, 
 		if(is_walkable(recursionlevel+1, currentNode->kids[k]) &&
 		   currentNode->kids[k] != currentNode->parent)
 		{
-			constructRoutes(currentNode->kids[k], currentNode, weight, i, j, recursionlevel+1);
+			constructRoutes(currentNode->kids[k], currentNode, weight, i, recursionlevel+1);
 
 			weight += currentNode->weight;
 			if(flameTimer[currentNode->x][curretNode->y])
@@ -352,33 +352,46 @@ void constructRoutes(node* currentNode, node* parent, char &maxweight, char &x, 
 			if(weight > maxweight)
 			{
 				maxweight = weight;
-				x = i;
-				y = j;
+				dir = i;
 				depth = recursionlevel + 1;
 			}
 		}
 	}
 }
 
-void playNormal(bool &place, int &x, int &y)
+void playNormal(bool &place, int &movedir)
 {
-	int length, movex, movey, weight;
+	int length, movedir = 0, weight;
 
 	constructRoutes(rootNode, NULL, weight, movex, movey, 1, length);
-	if(length > 6)
+	if(length > 3)
 	{
-		place = 0;
-		x = movex;
-		y = movey;
-		return;
-	}
-	if(length < 3)
-	{
-		place = 1;
-		//magic
+		place = length<=6;
 		return;
 	}
 
-	//dracu stie :-"
+	int i, weight, maxweight = -1, maxi=-1;
+	node tempNode, currNode;
+	place = 1;
+	weight = 0;
+	// euristica, n-as paria ca si mere dar fie...
 
+	for(int i=0; i<4; ++i)
+	{
+		currNode.x = rootNode->x + dirx[i];
+		currNode.y = rootNode->y + diry[i];
+		if(is_walkable(1, currNode));
+			for(j=1; j<4; ++j)
+			{
+				tempNode.x = currNode->x + dirx[j];
+				tempNode.y = currNode->y + diry[j];
+				if(is_walkable(2, tempNode))
+				++weight;
+			}
+		if(weight > maxweight)
+		{
+			maxweight = weight;
+			movedir = i;
+		}
+	}
 }
