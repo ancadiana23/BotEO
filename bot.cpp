@@ -39,7 +39,7 @@ int init()
 	(inet_aton(SERVER_IP, &(to_station.sin_addr)));
 
 	int connected = connect(fd, (struct sockaddr *)&to_station, sizeof(to_station));
-	
+
 	int receive;
 	char * name = (char *)malloc(4);
 
@@ -107,7 +107,7 @@ int init()
 		/*	if (receive < 0)
 			{
 				printf("Cannot receive data");
-			}*/	
+			}*/
 			sprintf(name, "%d", buf);
 			matrix[i][j] = (uint32_t) atoi(name);
 
@@ -142,7 +142,7 @@ int init()
 		}
 		printf("\n");
 	}
-*/	
+*/
 	return start_mod_agresiv;
 }
 
@@ -230,7 +230,7 @@ void calculateChainReaction()
 			}
 		}
 	}
-	
+
 	while(!Q.empty())
 	{
 		current=Q.top();
@@ -341,7 +341,7 @@ void initializeRoutes() {
 					newNode->kids.push_back(newNode->parent);
 					corr[next.x][next.y] = newNode;
 				}
-				
+
 				corr[current.x][current.y]->weight *= 2;
                 corr[current.x][current.y]->kids.push_back(newNode);
 			}
@@ -364,7 +364,7 @@ void constructRoutes(node* currentNode, node* parent, int &maxweight, int &dir, 
 		initializeRoutes();
 		return;
 	}
-	
+
 	currentNode->parent = parent;
 	tempweights[currentNode->x][currentNode->y] = 0;
 
@@ -410,18 +410,19 @@ void playNormal(bool &place, int &movedir)
 	}
 
 	int maxweight = -1;
+	j = movedir;
 	node tempNode, currNode;
 	place = 1;
 	weight = 0;
 	// euristica, n-as paria ca si mere dar fie...
 
-	for(int i=0; i<4; ++i)
+	for(i=0; i<4; ++i)
 	{
 		currNode.x = rootNode->x + dirx[i];
 		currNode.y = rootNode->y + diry[i];
-		if(is_walkable(1, &currNode) && tempweights[currNode.x][currNode.y] > maxweight)
+		if(i!=j && is_walkable(1, &currNode) && tempweights[currNode.x][currNode.y] > maxweight)
 		{
-			maxweight = weight;
+			maxweight = tempweights[currNode.x][currNode.y];
 			movedir = i;
 		}
 	}
