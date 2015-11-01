@@ -7,7 +7,7 @@
 #include <queue>
 #include <string.h>
 #include <sys/types.h>
-#include <sys/socket.h> 
+#include <sys/socket.h>
 #include <unistd.h>
 
 
@@ -38,9 +38,7 @@ void init()
 	if(fd < 0) {
 		return;
 	}
-	
-	
-	
+
 	to_station.sin_family = AF_INET;
 
 	to_station.sin_port = htons(SERVER_PORT);
@@ -62,7 +60,7 @@ void init()
 	
 	int receive;
 	char * name = (char *)malloc(4);
-	
+
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
 	id = (int) atoi(name);
@@ -70,11 +68,11 @@ void init()
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
 	currentmovement = (int) atoi(name);
-	
+
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
 	start_mod_agresiv = (int) atoi(name);
-	
+
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
 	mutare_maxima = (int) atoi(name);
@@ -82,7 +80,7 @@ void init()
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
 	n = (int) atoi(name);
-	
+
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
 	m = (int) atoi(name);
@@ -92,10 +90,10 @@ void init()
 	{
 		for (j = 0; j < m; j++)
 		{
-			receive = recv(fd, &buf, 4, 0);	
+			receive = recv(fd, &buf, 4, 0);
 			sprintf(name, "%d", buf);
 			matrix[i][j] = (uint32_t) atoi(name);
-			
+
 			int aux = matrix[i][j];
 			int k;
 			for (k = 1; k <= 8 ;k++)
@@ -115,7 +113,7 @@ void init()
 					}
 				}
 				aux = aux >> 1;
-			}			
+			}
 		}
 	}	
 	printf("%d %d %d \n", id, n, m);
@@ -139,20 +137,20 @@ void readMatrix()
 	int receive;
 	char * name = (char *)malloc(4);
 	char *buf = (char*)calloc (4, 1);
-	 
+
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
 	currentmovement = (int) atoi(name);
-	
+
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
 	start_mod_agresiv = (int) atoi(name);
-	
+
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
 	mutare_maxima = (int) atoi(name);
-	
-	
+
+
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
 	n = (int) atoi(name);
@@ -160,16 +158,16 @@ void readMatrix()
 	receive = recv(fd, &buf, 4, 0);
 	sprintf(name, "%d", buf);
 	m = (int) atoi(name);
-	
+
 	int i,j;
 	for (i = 0; i < n ;i++)
 	{
 		for (j = 0; j < m; j++)
 		{
-			receive = recv(fd, &buf, 4, 0);	
+			receive = recv(fd, &buf, 4, 0);
 			sprintf(name, "%d", buf);
 			matrix[i][j] = (uint32_t) atoi(name);
-			
+
 			if (matrix[i][j] & 1 << id)
 			{
 				currentx = i;
@@ -327,9 +325,9 @@ inline bool is_walkable(int time, node* currentNode) {
 			 flameTimer[currentNode->x][currentNode->y] + time <= 0);
 }
 
-void constructRoutes(node* currentNode, node* parent, char &maxweight, char &x, char &y, int recursionlevel)
+void constructRoutes(node* currentNode, node* parent, char &maxweight, char &x, char &y, int recursionlevel, int &depth)
 {
-	char weight = -120, i=-1, j=-1;
+	char weight = -120, i=-1, j=-1, k;
 	if(rootNode == NULL || rootNode->kids.empty())
 	{
 		initializeRoutes();
@@ -338,18 +336,49 @@ void constructRoutes(node* currentNode, node* parent, char &maxweight, char &x, 
 
 	currentNode->parent = parent;
 
-	for(i=0; i<currentNode->kids.size(); ++i)
+	for(k=0; k<currentNode->kids.size(); ++k)
 	{
-		if(is_walkable(recursionlevel+1, currentNode->kids[i]) &&
-		   currentNode->kids[i] != currentNode->parent)
+		if(is_walkable(recursionlevel+1, currentNode->kids[k]) &&
+		   currentNode->kids[k] != currentNode->parent)
 		{
-			constructRoutes(currentNode->kids[i], currentNode, weight, i, j, recursionlevel+1);
+			constructRoutes(currentNode->kids[k], currentNode, weight, i, j, recursionlevel+1);
+
+			weight += currentNode->weight;
+			if(flameTimer[currentNode->x][curretNode->y])
+				weight += BOMBRANGE;
+			if(currentNode->x == enemyx && currentNode->y == enemyy)
+				weight += ENEMYVALUE;
+
 			if(weight > maxweight)
 			{
 				maxweight = weight;
 				x = i;
 				y = j;
+				depth = recursionlevel + 1;
 			}
 		}
 	}
+}
+
+void playNormal(bool &place, int &x, int &y)
+{
+	int length, movex, movey, weight;
+
+	constructRoutes(rootNode, NULL, weight, movex, movey, 1, length);
+	if(length > 6)
+	{
+		place = 0;
+		x = movex;
+		y = movey;
+		return;
+	}
+	if(length < 3)
+	{
+		place = 1;
+		//magic
+		return;
+	}
+
+	//dracu stie :-"
+
 }
