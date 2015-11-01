@@ -42,6 +42,7 @@ void calculateChainReaction()
 	while(!Q.empty())
 	{
 		current=Q.top();
+		Q.pop();
 		for(i=1;i<=6;++i)
 		{
 			if((matrix[current.x+i][current.y]&((1<<15)==1))||(current.x+i>m)) break;
@@ -66,7 +67,6 @@ void calculateChainReaction()
 			if(matrix[current.x][current.y+j]&(11111111<<24))
 				matrix[current.x][current.y+j] = matrix[current.x][current.y]&(11111111<<24)+1<<24;
 		}
-		Q.pop();
 	}
 }
 
