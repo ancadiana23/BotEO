@@ -400,5 +400,6 @@ void playNormal(bool &place, int &movedir)
 }
 
 void playAggresive(bool &place, int&movedir) {
-
+	//nota: cand suntem aproape de adversar, tactica ar trebui sa fie aceeasi ca la play aggressive
+	//care e tactica asta...yeah idk
 }

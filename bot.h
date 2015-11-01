@@ -19,7 +19,7 @@ void calculateFlameTimers(); //uint32_t matrix[32][32], int n, int m, char flame
 
 void initializeRoutes(); //apelat la prima mutare
 
-void constructRoutes(node* currentNode, node* parent, char &maxweight, char dir, int recursionlevel, int &depth); //uint32_t matrix[32][32], int n, int m,  node* corr[32][32], node rootNode
+void constructRoutes(node* currentNode, node* parent, int &maxweight, int &dir, int recursionlevel, int &depth); //uint32_t matrix[32][32], int n, int m,  node* corr[32][32], node rootNode
 
 void playNormal();
 
