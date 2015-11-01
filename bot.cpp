@@ -100,9 +100,11 @@ void initializeRoutes() {
 	}
 }
 
-bool is_walkable(int time, node* currentNode) {
-	return (matrix[currentNode->x][currentNode->y] &(11111111<<24)) == 0 &&
-			flameTimer[currentNode->x][currentNode->y] >= time;
+inline bool is_walkable(int time, node* currentNode) {
+	return  (matrix[currentNode->x][currentNode->y] &(11111111<<24)) == 0 &&
+			(matrix[currentNode->x][currentNode->y] &(11111111<<16)) == 0 &&
+			(flameTimer[currentNode->x][currentNode->y] == 0 ||
+			 flameTimer[currentNode->x][currentNode->y] + time <= 0);
 }
 
 void constructRoutes(node* currentNode, node* parent, char &maxweight, char &x, char &y, int recursionlevel)
