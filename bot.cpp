@@ -17,6 +17,59 @@ void readMatrix()
 
 }
 
+bool operator<(const queueNode& L, const queueNode& R)
+{
+	return (matrix[L.x][L.y]&(11111111<<24))<(matrix[R.x][R.y]&(11111111<<24));
+}
+
+void calculateChainReaction()
+{
+	int i,j;
+	std::priority_queue<queueNode,vector<queueNode> > Q;
+	queueNode current;
+	for(int i=0;i<m;++i)
+	{
+		for(int j=0;j<n;++j)
+		{
+			if(matrix[i][j]&(11111111<<24))
+			{
+				current.x=i;
+				current.y=j;
+				Q.push(current);
+			}
+		}
+	}
+	while(!Q.empty())
+	{
+		current=Q.top();
+		for(i=1;i<=6;++i)
+		{
+			if((matrix[current.x+i][current.y]&((1<<15)==1))||(current.x+i>m)) break;
+			if(matrix[current.x+i][current.y]&(11111111<<24)
+				matrix[current.x+i][current.y] = matrix[current.x][current.y]&(11111111<<24)+1<<24;
+		}
+		for(i=-6;i<0;++i)
+		{
+			if((matrix[current.x+i][current.y]&((1<<15)==1))||(current.x-i<0)) break;
+			if(matrix[current.x+i][current.y]&(11111111<<24)
+				matrix[current.x+i][current.y] = matrix[current.x][current.y]&(11111111<<24)+1<<24;
+		}
+		for(j=1;j<=6;++j)
+		{
+			if((matrix[current.x][current.y+j]&(1<<15==1))||(current.y+j>n)) break;
+			if(matrix[current.x][current.y+j]&(11111111<<24))
+				matrix[current.x][current.y+j] = matrix[current.x][current.y]&(11111111<<24)+1<<24;
+		}
+		for(j=-6;j<0;++j)
+		{
+			if((matrix[current.x][current.y+j]&(1<<15)==1)||(current.y+j<0)) break;
+			if(matrix[current.x][current.y+j]&(11111111<<24))
+				matrix[current.x][current.y+j] = matrix[current.x][current.y]&(11111111<<24)+1<<24;
+		}
+		Q.pop();
+	}
+}
+
 void calculateFlameTimers()
 {
 	int i, j, ic, jc;
@@ -27,25 +80,25 @@ void calculateFlameTimers()
 			if(matrix[i][j]&(11111111<<24!=0))
 			{
 				flameTimer[i][j]= -(11111111<<24)&matrix[i][j]; //Posibil tre schimbat cu 8 in lil endian
-				for(ic=0;ic<=6;++ic)
+				for(ic=1;ic<=6;++ic)
 				{
 					if((matrix[ic][j]&(1<<15))||((ic+i)>n)) break;
 					if(flameTimer[i][j]<flameTimer[ic][j])
 						flameTimer[ic][j]=flameTimer[i][j];
 				}
-				for(ic=0;ic>=-6;--ic)
+				for(ic=-1;ic>=-6;--ic)
 				{
 					if((matrix[ic][j]&(1<<15))||((i-ic)<0)) break;
 					if(flameTimer[i][j]<flameTimer[ic][j])
 						flameTimer[ic][j]=flameTimer[i][j];
 				}
-				for(jc=0;jc<=6;++jc)
+				for(jc=1;jc<=6;++jc)
 				{
 					if((matrix[i][jc]&(1<<15))||((jc+j)>m)) break;
 					if(flameTimer[i][j]<flameTimer[i][jc])
 						flameTimer[i][jc]=flameTimer[i][j];
 				}
-				for(jc=0;jc>=-6;--jc)
+				for(jc=-1;jc>=-6;--jc)
 				{
 					if((matrix[i][jc]&(1<<15))||((j-jc)<0)) break;
 					if(flameTimer[i][j]<flameTimer[i][jc])
